@@ -312,7 +312,7 @@ void setup() {
   //for rosserial
   //nh.getHardware()->setBaud(57600)
   nh.initNode();
-  nh.advertiseService(server);
+  nh.advertiseService(service_server);
   nh.advertise(pub_potentiometer); 
   while(!nh.connected()) nh.spinOnce();
   
@@ -334,18 +334,6 @@ void loop() {
   potentiometer_msg.data_length=2;
   pub_potentiometer.publish(&potentiometer_msg);
 
-
-  
-  //creare qui il possibile servizio che ha arduino come client
-
-  
-
-/*Movement::Response res;
-
-client.call(req,res);
-
-questo pezzo non dovrebbe servive se usiamo arduino come server
-*/
 nh.spinOnce();
   delay(500);
 }
@@ -779,22 +767,25 @@ int Flexible_Movement(float * Position_FM, int* Flag_forward_FM, float Max_time_
 
 
 //fuction to put the exo in the storage position
-int Storing(){
+char Storing(){
 // else if (Straight_key == 'n')
   float Final_position_1[4] = {80.0, -45.0, 80.0, -45.0};//(LH, LK, RH, RK)
   int Flag_forward_1[4] = {1, 1, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
-  return Flexible_Movement(Final_position_1, Flag_forward_1, 5.0, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+  Flag_Movement=Flexible_Movement(Final_position_1, Flag_forward_1, 5.0, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+  char Flag_Mov=Flag_Movement;
+  return Flag_Mov;
 }
 
 //function to put the exo in the Stand position
-int Stand_Straight()
+char Stand_Straight()
 {
    //if (Stand_exer_key == 'S') {
   float Final_position_1[4] = {0.0, 0.0, 0.0, 0.0};//(position array, flag activation array, maximum time for movement)
   int Flag_forward_1[4] = {1, 1, 1, 1};//(LH, LK, RH, RK)//0 represents that motor will not be used (LH, LK, RH, RK)
   float Speed_array_customized[4] = {40.0, 40.0, 40.0, 40.0};
-  return Flexible_Movement(Final_position_1, Flag_forward_1, 8.0, 0, Speed_array_customized, Limit_array_default, 0); //(position array, flag activation array, maximum time for movement)
-            
+  Flag_Movement=Flexible_Movement(Final_position_1, Flag_forward_1, 8.0, 0, Speed_array_customized, Limit_array_default, 0); //(position array, flag activation array, maximum time for movement)
+  char Flag_Mov=Flag_Movement;
+  return Flag_Mov;       
 }
 
 //function that is claimed in the different phase of the movement
@@ -804,79 +795,83 @@ int Stand_Straight()
 //ho dovuto definire anche flag_movement come variabile globale
 
 //if (Gait_key == '1') {
-int Step_One(){
+char Step_One(){
 float Final_position_1[4] = { -1.0, -1.0, 55.0, -45.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
 int Flag_forward_1[4] = {0, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
 Flag_Movement = Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-return Flag_Movement;
+char Flag_Mov=Flag_Movement;
+return Flag_Mov;
 }
 
-int Step_Two(){
+char Step_Two(){
 //if (Gait_key == '2') {
   float Final_position_1[4] = { -10.0, -1.0, 25.0, 0.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  return Flag_Movement;
+  char Flag_Mov=Flag_Movement;
+  return Flag_Mov;
 }
 
-int Step_Three(){
+char Step_Three(){
 //if (Gait_key == '3') {
   float Final_position_1[4] = { 30.0, -45.0, 0.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   float Speed_array_customized[4] = {Speed_array_default[0] * 1.2, Speed_array_default[1], Speed_array_default[2], Speed_array_default[3]};
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_customized, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  return Flag_Movement;
+  char Flag_Mov=Flag_Movement;
+  return Flag_Mov;
 }
 
-int Step_Four()
+char Step_Four()
 {
   //if (Gait_key == '4') {
   float Final_position_1[4] = { 20.0, 0.0, -10.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  return Flag_Movement;
+  char Flag_Mov=Flag_Movement;
+  return Flag_Mov;
 
 }
 
-int Step_Five(){
+char Step_Five(){
 //if (Gait_key == '5') {
   float Final_position_1[4] = { 0.0, 0.0, -1.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 0, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  return Flag_Movement;
+  char Flag_Mov=Flag_Movement;
+  return Flag_Mov;
 
 
 }
 
-int callback (Movement::request & req,Movement::Response & res)
+void callback (Movement::request & req,Movement::Response & res)
 {
   if (req == 'n'){
   res=storing();
-  return res;
   }
   else if (req == 's'){
   res=Stand_Straight();
-  return res;
+  
   }
   else if (req == '1'){
   res=Step_One();
-  return res;
+  
   }
   else if (req == '2'){
   res=Step_Two();
-  return res;
+  
   }
   else if (req == '3'){
   res=Step_Three();
-  return res;
+  
   }
   else if (req == '4'){
   res=Step_Four();
-  return res;
+  
   }
   else if (req == '5'){
   res=Step_Five();
-  return res;
+  
   }
 
 
