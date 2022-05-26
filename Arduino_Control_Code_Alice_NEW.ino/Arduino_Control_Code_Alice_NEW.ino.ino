@@ -2,7 +2,6 @@
 //        Copyright INDI Ingénierie et Design SAS France, 2019-2021.       //
 /////////////////////////////////////////////////////////////////////////////
 
-from alice_exoskeleton.srv import Movemnt as MovementSrv //non penso si faccia così
 
 //////////////////////////////Calling libraries//////////////////////////////
 #include <PID_L1_V4.h>
@@ -15,22 +14,26 @@ from alice_exoskeleton.srv import Movemnt as MovementSrv //non penso si faccia c
 #include <ros.h>
 #include <std_msgs/Float32MultiArray.h>
 
-//in teoria questi due non servono
-#include <std_msgs/String.h> //this for the request of the client
-#include <std_msgs/Int32.h> //this for the response of the server 
+#include <rosserial_arduino/Test.h>
 
-#include <std_srvs/Movement.h> //capire bene questo
+//#include <alice_exoskeleton/Movement.h>
+ //capire bene questo
 
-using std_srvs::Movement 
+//using alice_exoskeleton.srv::Movement  //dovrebbe essere giusta così la chiamata
 
+//ROS inizialization
 ros::NodeHandle  nh;
+using rosserial_arduino::Test;
 
-ros::ServiceServer<Movement::Request, Movement::Response> server("Movement_srv",&callback);
-
+ros::ServiceServer<Test::Request, Test::Response> service_server("Movement_srv",&callback);
+Test::Request test_req; //capire req da chi viene definita
+Test::Response test_res;
 std_msgs::Float32MultiArray potentiometer_msg;  //messaggio da pubblicare
 ros::Publisher pub_potentiometer("/angle", &potentiometer_msg); //go to line 295
 
-int Flag_Movement;
+int Flag_Movement;//we must define it as global variable and it is callback from the function connected to the movement
+float Maximum_time_Step = 5.0; //add this new global viariable that we use during the step function
+
 //////////////////////////////Deacceleration values for the PID/////////////////////////////////
 float General_deacceleration = 0;//If this value is less than 1, no deacceleration is implemented.
 float Stopping_speed = 20.0;//This is the Stopping speed at which the motors are assumed to enter static friction regime
@@ -307,6 +310,7 @@ void setup() {
   pinMode(13, OUTPUT);    // sets the digital pin 13 as output
 
   //for rosserial
+  //nh.getHardware()->setBaud(57600)
   nh.initNode();
   nh.advertiseService(server);
   nh.advertise(pub_potentiometer); 
@@ -333,13 +337,15 @@ void loop() {
 
   
   //creare qui il possibile servizio che ha arduino come client
-Movement::Request req;
-Movement::Response res;
+
+  
+
+/*Movement::Response res;
 
 client.call(req,res);
 
-
-
+questo pezzo non dovrebbe servive se usiamo arduino come server
+*/
 nh.spinOnce();
   delay(500);
 }
@@ -842,7 +848,7 @@ int Step_Five(){
 
 }
 
-int callback (req)
+int callback (Movement::request & req,Movement::Response & res)
 {
   if (req == 'n'){
   res=storing();
@@ -856,19 +862,19 @@ int callback (req)
   res=Step_One();
   return res;
   }
-  else if (req == 's'){
+  else if (req == '2'){
   res=Step_Two();
   return res;
   }
-  else if (req == 's'){
+  else if (req == '3'){
   res=Step_Three();
   return res;
   }
-  else if (req == 's'){
+  else if (req == '4'){
   res=Step_Four();
   return res;
   }
-  else if (req == 's'){
+  else if (req == '5'){
   res=Step_Five();
   return res;
   }
