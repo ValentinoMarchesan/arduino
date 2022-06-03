@@ -20,7 +20,7 @@
 ros::NodeHandle  nh;
 using rosserial_arduino::Test;
 
-void callback (const Test::Request & req,Test::Response & res)
+void callback (const Test::Request &req,Test::Response &res)
 {
 
   // alcuni usano req.input e res.output
@@ -55,7 +55,7 @@ void callback (const Test::Request & req,Test::Response & res)
 
 }
 
-ros::ServiceServer<Test::Request, Test::Response> server("Movement_srv",&callback);
+ros::ServiceServer<Test::Request, Test::Response> server("/Movement_srv",&callback);
 Test::Request test_req; //capire req da chi viene definita
 Test::Response test_res;
 std_msgs::Float32MultiArray potentiometer_msg;  //messaggio da pubblicare
@@ -802,8 +802,8 @@ char Storing(){
   float Final_position_1[4] = {80.0, -45.0, 80.0, -45.0};//(LH, LK, RH, RK)
   int Flag_forward_1[4] = {1, 1, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement=Flexible_Movement(Final_position_1, Flag_forward_1, 5.0, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  char Flag_Mov=Flag_Movement;
-  return Flag_Mov;
+   if (Flag_Movement == 1) { return '1';}
+  else { return '0' ;}
 }
 
 //function to put the exo in the Stand position
@@ -814,8 +814,8 @@ char Stand_Straight()
   int Flag_forward_1[4] = {1, 1, 1, 1};//(LH, LK, RH, RK)//0 represents that motor will not be used (LH, LK, RH, RK)
   float Speed_array_customized[4] = {40.0, 40.0, 40.0, 40.0};
   Flag_Movement=Flexible_Movement(Final_position_1, Flag_forward_1, 8.0, 0, Speed_array_customized, Limit_array_default, 0); //(position array, flag activation array, maximum time for movement)
-  char Flag_Mov=Flag_Movement;
-  return Flag_Mov;       
+   if (Flag_Movement == 1) { return '1';}
+  else { return '0'; }
 }
 
 //function that is claimed in the different phase of the movement
@@ -829,8 +829,8 @@ char Step_One(){
 float Final_position_1[4] = { -1.0, -1.0, 55.0, -45.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
 int Flag_forward_1[4] = {0, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
 Flag_Movement = Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-char Flag_Mov=Flag_Movement;
-return Flag_Mov;
+ if (Flag_Movement == 1) { return '1';}
+  else { return '0' ;}
 }
 
 char Step_Two(){
@@ -838,8 +838,8 @@ char Step_Two(){
   float Final_position_1[4] = { -10.0, -1.0, 25.0, 0.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  char Flag_Mov=Flag_Movement;
-  return Flag_Mov;
+   if (Flag_Movement == 1) { return '1';}
+  else { return '0' ;}
 }
 
 char Step_Three(){
@@ -848,8 +848,8 @@ char Step_Three(){
   int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   float Speed_array_customized[4] = {Speed_array_default[0] * 1.2, Speed_array_default[1], Speed_array_default[2], Speed_array_default[3]};
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_customized, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  char Flag_Mov=Flag_Movement;
-  return Flag_Mov;
+   if (Flag_Movement == 1) { return '1';}
+  else { return '0' ;}
 }
 
 char Step_Four()
@@ -858,8 +858,8 @@ char Step_Four()
   float Final_position_1[4] = { 20.0, 0.0, -10.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  char Flag_Mov=Flag_Movement;
-  return Flag_Mov;
+   if (Flag_Movement == 1) { return '1';}
+  else { return '0' ;}
 
 }
 
@@ -868,10 +868,8 @@ char Step_Five(){
   float Final_position_1[4] = { 0.0, 0.0, -1.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 0, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  char Flag_Mov=Flag_Movement;
-  return Flag_Mov;
-
-
+  if (Flag_Movement == 1) { return '1';}
+  else { return '0' ;}
 }
 /*
 void callback (const Test::Request & req,Test::Response & res)
@@ -909,411 +907,6 @@ void callback (const Test::Request & req,Test::Response & res)
 
 }
 */
-
-
-///////////This function detects if valid values have been introduced for the movement of a motor//////////////////
-int correct_commands_step_validation(int direction_BF_ccsv) {
-  int Flag_1 = 0;
-  int number_valid_commands = sizeof(commands_for_menus) / sizeof(commands_for_menus[0]);//commands_for_menus should not be empty
-  for (int i_ccsv = 0; i_ccsv < number_valid_commands; i_ccsv++) {
-    if (direction_BF_ccsv == commands_for_menus[i_ccsv]) {
-      Flag_1 = 1;
-      break;
-    }
-  }
-  return Flag_1;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////This function returns 1 when "Timer_ts surpassed" the threshold "threshold_ts" /////////
-int Timeout_step(float threshold_ts, int reset_ts) {
-  int Flag_timerout_stLK = 0;
-  static float Timer_ts = 0;
-  static float Time_stamp_ts = 0;
-  if (reset_ts == 1) {
-    Time_stamp_ts = micros();
-    Timer_ts = 0;
-  }
-  else {
-    Timer_ts = max(micros() - Time_stamp_ts, 0) / 1000000;//This part relies on the correct implementation of the  sampling time "Sampling_time"
-  }
-
-  if (Timer_ts >= threshold_ts) {
-    Flag_timerout_stLK = 1;
-  }
-  else {
-    Flag_timerout_stLK = 0;
-  }
-  return Flag_timerout_stLK;
-}
-
-
-
-int Manual_movement(int joint_calibration, bool info_MM) {
-  //////////////////////////////////Left Hip Motor//////////////////////////////
-  if ((joint_calibration == 'u') || (joint_calibration == 'y')) {
-
-    int manualPWMLH;
-    if (joint_calibration == 'u') {
-      manualPWMLH = manualPWMALH;
-    }
-    else {
-      manualPWMLH = manualPWMBLH;
-    }
-    Execute_LH.PID_Power(manualPWMLH);
-    delay(300);
-    Execute_LH.PID_Power(0);
-    delay(500);
-    potentiometer_valueLH = 1.0 * analogRead(potPinLH); //voltage meassurenment with 10bits resolution
-    if (info_MM) {
-      if (Flag_python == 0) {
-        Serial.println("Pot Value LH: ");
-        Serial.println(potentiometer_valueLH);
-        Serial.println("Angle: ");
-        Serial.println(Preprocessing_LH.PID_map_float(potentiometer_valueLH, minpotvalueLH, midpotvalueLH, maxpotvalueLH, minangleLH, midangleLH , maxangleLH));
-        Serial.println(" ");
-      }
-    }
-    return 1;
-  }
-  ///////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////Left Knee Motor/////////////////////////////
-  else if ((joint_calibration == 'j') || (joint_calibration == 'h')) {
-
-    int manualPWMLK;
-    if (joint_calibration == 'j') {
-      manualPWMLK = manualPWMALK;
-    }
-    else {
-      manualPWMLK = manualPWMBLK;
-    }
-    Execute_LK.PID_Power(manualPWMLK);
-    delay(300);
-    Execute_LK.PID_Power(0);
-    delay(500);
-    potentiometer_valueLK = 1.0 * analogRead(potPinLK); //voltage meassurenment with 10bits resolution
-    if (info_MM) {
-      if (Flag_python == 0) {
-        Serial.println("Pot Value LK: ");
-        Serial.println(potentiometer_valueLK);
-        Serial.println("Angle: ");
-        Serial.println(Preprocessing_LK.PID_map_float(potentiometer_valueLK, minpotvalueLK, midpotvalueLK, maxpotvalueLK, minangleLK, midangleLK , maxangleLK));
-        Serial.println(" ");
-      }
-    }
-    return 1;
-  }
-  ///////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////Right Hip Motor//////////////////////////////
-  else if ((joint_calibration == 'o') || (joint_calibration == 'i')) {
-    int manualPWMRH;
-    if (joint_calibration == 'o') {
-      manualPWMRH = manualPWMARH;
-    }
-    else {
-      manualPWMRH = manualPWMBRH;
-    }
-    Execute_RH.PID_Power(manualPWMRH);
-    delay(300);
-    Execute_RH.PID_Power(0);
-    delay(500);
-    potentiometer_valueRH = 1.0 * analogRead(potPinRH); //voltage meassurenment with 10bits resolution
-    if (info_MM) {
-      if (Flag_python == 0) {
-        Serial.println("Pot Value RH: ");
-        Serial.println(potentiometer_valueRH);
-        Serial.println("Angle: ");
-        Serial.println(Preprocessing_RH.PID_map_float(potentiometer_valueRH, minpotvalueRH, midpotvalueRH , maxpotvalueRH, minangleRH, midangleRH , maxangleRH));
-        Serial.println(" ");
-      }
-    }
-    return 1;
-  }
-  ///////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////Right Knee Motor//////////////////////////////
-  else if ((joint_calibration == 'l') || (joint_calibration == 'k')) {
-    int manualPWMRK;
-    if (joint_calibration == 'l') {
-      manualPWMRK = manualPWMARK;
-    }
-    else {
-      manualPWMRK = manualPWMBRK;
-    }
-    Execute_RK.PID_Power(manualPWMRK);
-    delay(300);
-    Execute_RK.PID_Power(0);
-    delay(500);
-    potentiometer_valueRK = 1.0 * analogRead(potPinRK); //voltage meassurenment with 10bits resolution
-    if (info_MM) {
-      if (Flag_python == 0) {
-        Serial.println("Pot Value RK: ");
-        Serial.println(potentiometer_valueRK);
-        Serial.println("Angle: ");
-        Serial.println(Preprocessing_RK.PID_map_float(potentiometer_valueRK, minpotvalueRK, midpotvalueRK , maxpotvalueRK, minangleRK, midangleRK, maxangleRK));
-        Serial.println(" ");
-      }
-    }
-    return 1;
-  }
-
-  else {
-    return 0;
-  }
-}
-
-
-void Movement_with_check_points(float * Final_position_mwcp, int max_Cont_movement_mwcp, int *Flag_forward_mwcp, float Maximum_time_mwcp, int Flag_relative, float * Speed_array_mwcp, float * Limit_array_mwcp, float Deacceleration_mwcp, int extra_time_mwcp) {
-  int Flag_Continue_movement_mwcp = 0;
-  int Flag_Continue_movement_mwcp_aux = 0;
-  int Cont_movement_mwcp = 0;
-  float Final_position_movement_mwcp[4];//LH, LK, RH, RK
-  int Flag_forward_step_mwcp[4];//LH, LK, RH, RK
-  while ((Cont_movement_mwcp < max_Cont_movement_mwcp) && (Flag_Continue_movement_mwcp < 2)) {
-    //Positions for each joint are assigned
-    Final_position_movement_mwcp[0] = Final_position_mwcp[Cont_movement_mwcp * 4 + 0];//LH
-    Final_position_movement_mwcp[1] = Final_position_mwcp[Cont_movement_mwcp * 4 + 1]; //LK
-    Final_position_movement_mwcp[2] = Final_position_mwcp[Cont_movement_mwcp * 4 + 2]; //RH
-    Final_position_movement_mwcp[3] = Final_position_mwcp[Cont_movement_mwcp * 4 + 3]; //RH
-
-    Flag_forward_step_mwcp[0] = Flag_forward_mwcp[Cont_movement_mwcp * 4 + 0]; //LH
-    Flag_forward_step_mwcp[1] = Flag_forward_mwcp[Cont_movement_mwcp * 4 + 1]; //LK
-    Flag_forward_step_mwcp[2] = Flag_forward_mwcp[Cont_movement_mwcp * 4 + 2]; //RH
-    Flag_forward_step_mwcp[3] = Flag_forward_mwcp[Cont_movement_mwcp * 4 + 3]; //RH
-
-    Flag_Continue_movement_mwcp = Flag_Continue_movement_mwcp +
-                                  Flexible_Movement(Final_position_movement_mwcp, Flag_forward_step_mwcp, Maximum_time_mwcp, Flag_relative, Speed_array_mwcp, Limit_array_mwcp, Deacceleration_mwcp); //(position array, flag activation array, maximum time for movement)
-
-    if (Flag_Continue_movement_mwcp == 1) {
-      if (Flag_Continue_movement_mwcp_aux == 1) {
-        Flag_Continue_movement_mwcp = 0;
-        Flag_Continue_movement_mwcp_aux = 0;
-        Maximum_time_mwcp = 5.0;
-      }
-      else {
-        if (extra_time_mwcp == 1) {
-          Flag_Continue_movement_mwcp_aux = 1;
-          Maximum_time_mwcp = 3.0;
-        }
-        else {
-          Flag_Continue_movement_mwcp = 2;
-        }
-      }
-    }
-    if (Flag_Continue_movement_mwcp == 0) {
-      if (Flag_python == 0) {
-        Serial.print("Finished case: ");
-        Serial.println(Cont_movement_mwcp);
-      }
-      Cont_movement_mwcp = Cont_movement_mwcp + 1;
-      Maximum_time_mwcp = 5.0;
-    }
-  }
-  if (Flag_Continue_movement_mwcp == 2) {
-    for (int i_buffer = 0; i_buffer < 20; i_buffer++ ) {
-      Serial.read();
-    }
-    if (Flag_python == 0) {
-      Serial.println("An Error has occured");
-    }
-  }
-}
-
-void Recalibration(int Joint_R) {
-  int iterations_R = 100;
-  if (Joint_R == 'y') {
-    minpotvalueLH = Average_meassurement_calibration(potPinLH, iterations_R); //voltage meassurenment (10bits resolution);
-    minangleLH = -30; // (Degrees)
-    midpotvalueLH = (minpotvalueLH + maxpotvalueLH) / 2; // 10-bit Resolution (0-1023)
-    midangleLH = (minangleLH + maxangleLH) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of minpotvalueLH to:");
-      Serial.println(minpotvalueLH);
-      Serial.print("Modify the value of minangleLH to:");
-      Serial.println(minangleLH);
-    }
-  }
-  else if (Joint_R == 'u') {
-    maxpotvalueLH = Average_meassurement_calibration(potPinLH, iterations_R); //voltage meassurenment (10bits resolution);
-    maxangleLH = 110; // (Degrees)
-    midpotvalueLH = (minpotvalueLH + maxpotvalueLH) / 2; // 10-bit Resolution (0-1023)
-    midangleLH = (minangleLH + maxangleLH) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of maxpotvalueLH to:");
-      Serial.println(maxpotvalueLH);
-      Serial.print("Modify the value of maxangleLH to:");
-      Serial.println(maxangleLH);
-    }
-  }
-  else if (Joint_R == 'i') {
-    minpotvalueRH = Average_meassurement_calibration(potPinRH, iterations_R); //voltage meassurenment (10bits resolution);
-    minangleRH = -30; // (Degrees)
-    midpotvalueRH = (minpotvalueRH + maxpotvalueRH) / 2; // 10-bit Resolution (0-1023)
-    midangleRH = (minangleRH + maxangleRH) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of minpotvalueRH to:");
-      Serial.println(minpotvalueRH);
-      Serial.print("Modify the value of minangleRH to:");
-      Serial.println(minangleRH);
-    }
-  }
-  else if (Joint_R == 'o') {
-    maxpotvalueRH  = Average_meassurement_calibration(potPinRH, iterations_R); //voltage meassurenment (10bits resolution);
-    maxangleRH = 110; // (Degrees)
-    midpotvalueRH = (minpotvalueRH + maxpotvalueRH) / 2; // 10-bit Resolution (0-1023)
-    midangleRH = (minangleRH + maxangleRH) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of maxpotvalueLH to:");
-      Serial.println(maxpotvalueRH);
-      Serial.print("Modify the value of maxangleLH to:");
-      Serial.println(maxangleRH);
-    }
-  }
-  else if (Joint_R == 'h') {
-    minpotvalueLK = Average_meassurement_calibration(potPinLK, iterations_R); //voltage meassurenment (10bits resolution);
-    minangleLK = -30; // (Degrees)
-    midpotvalueLK = (minpotvalueLK + maxpotvalueLK) / 2; // 10-bit Resolution (0-1023)
-    midangleLK = (minangleLK + maxangleLK) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of minpotvalueLK to:");
-      Serial.println(minpotvalueLK);
-      Serial.print("Modify the value of minangleLK to:");
-      Serial.println(minangleLK);
-    }
-  }
-  else if (Joint_R == 'j') {
-    maxpotvalueLK = Average_meassurement_calibration(potPinLK, iterations_R); //voltage meassurenment (10bits resolution);
-    maxangleLK = 110; // (Degrees)
-    midpotvalueLK = (minpotvalueLK + maxpotvalueLK) / 2; // 10-bit Resolution (0-1023)
-    midangleLK = (minangleLK + maxangleLK) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of maxpotvalueLK to:");
-      Serial.println(maxpotvalueLK);
-      Serial.print("Modify the value of maxangleLK to:");
-      Serial.println(maxangleLK);
-    }
-  }
-  else if (Joint_R == 'k') {
-    minpotvalueRK = Average_meassurement_calibration(potPinRK, iterations_R);  //voltage meassurenment (10bits resolution);
-    minangleRK = -30; // (Degrees)
-    midpotvalueRK = (minpotvalueRK + maxpotvalueRK) / 2; // 10-bit Resolution (0-1023)
-    midangleRK = (minangleRK + maxangleRK) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of minpotvalueRK to:");
-      Serial.println(minpotvalueRK);
-      Serial.print("Modify the value of minangleRK to:");
-      Serial.println(minangleRK);
-    }
-  }
-  else if (Joint_R == 'l') {
-    maxpotvalueRK = Average_meassurement_calibration(potPinRK, iterations_R); //voltage meassurenment (10bits resolution);
-    maxangleRK = 110; // (Degrees)
-    midpotvalueRK = (minpotvalueRK + maxpotvalueRK) / 2; // 10-bit Resolution (0-1023)
-    midangleRK = (minangleRK + maxangleRK) / 2; // (Degrees)
-    if (Flag_python == 0) {
-      Serial.println("To make change permanent");
-      Serial.print("Modify the value of maxpotvalueRK to:");
-      Serial.println(maxpotvalueRK);
-      Serial.print("Modify the value of maxangleRK to:");
-      Serial.println(maxangleRK);
-    }
-  }
-}
-
-float Average_meassurement_calibration(int potpin_joint_am, int iterations_am) {
-  float average = 0;
-  for (int i_am = 0; i_am < iterations_am; i_am++) {
-    average = average + 1.0 * analogRead(potpin_joint_am);
-    delayMicroseconds(1000);
-  }
-  average = 1.0 * average / iterations_am;
-  if (Flag_python == 0) {
-    Serial.println("Done");
-  }
-  return average;
-}
-
-
-
-
-////////This function returns 1 when "Timer_ts surpassed" the threshold "threshold_ts" /////////
-int Timeout_step2(float threshold_ts2, int reset_ts2) {
-  int Flag_timerout_stLK2 = 0;
-  static float Timer_ts2 = 0;
-  static float Time_stamp_ts2 = 0;
-  if (reset_ts2 == 1) {
-    Time_stamp_ts2 = micros();
-    Timer_ts2 = 0;
-  }
-  else {
-    Timer_ts2 = max(micros() - Time_stamp_ts2, 0) / 1000000;//This part relies on the correct implementation of the  sampling time "Sampling_time"
-  }
-
-  if (Timer_ts2 >= threshold_ts2) {
-    Flag_timerout_stLK2 = 1;
-  }
-  else {
-    Flag_timerout_stLK2 = 0;
-  }
-  return Flag_timerout_stLK2;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-
-void delay_safe(int milliseconds_delay) {
-  long iterations_ds = milliseconds_delay / 10;
-  int remainder_ds = milliseconds_delay - iterations_ds * 10;
-  if (iterations_ds > 0) {
-    for (int i_sf = 0; i_sf < iterations_ds; i_sf++) {
-      delayMicroseconds(10000);
-    }
-  }
-  if (remainder_ds > 0) {
-    delayMicroseconds(remainder_ds);
-  }
-} Test::Request & req,Test::Response & res)
-{
-
-  // alcuni usano req.input e res.output
-  if (req == 'n'){
-  res=Storing();
-  }
-  else if (req == 's'){
-  res=Stand_Straight();
-  
-  }
-  else if (req == '1'){
-  res=Step_One();
-  
-  }
-  else if (req == '2'){
-  res=Step_Two();
-  
-  }
-  else if (req == '3'){
-  res=Step_Three();
-  
-  }
-  else if (req == '4'){
-  res=Step_Four();
-  
-  }
-  else if (req == '5'){
-  res=Step_Five();
-  
-  }
-
-
-}
-
 
 
 ///////////This function detects if valid values have been introduced for the movement of a motor//////////////////
