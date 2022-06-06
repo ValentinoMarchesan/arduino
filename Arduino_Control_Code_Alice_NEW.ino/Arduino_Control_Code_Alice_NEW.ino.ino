@@ -33,27 +33,35 @@ void callback (const Test::Request &req,Test::Response &res)
   
   }
  
-
-  
-  else if (String(req.input) == String(1)){
+  else if (String(req.input) == String("uno")){
     res.output= Step_One();
-  
   }
-  else if (String(req.input) == String(2)){
+  else if (String(req.input) == String("due")){
   res.output=Step_Two();
   
   }
-  else if (String(req.input) == String(3)){
+  else if (String(req.input) == String("tre")){
   res.output=Step_Three();
 
   }
-  else if (String(req.input) == String(4)){
+  else if (String(req.input) == String("quattro")){
    res.output=Step_Four();
   
   }
-  else if (String(req.input) == String(5)){
+  else if (String(req.input) == String("cinque")){
     res.output=Step_Five();
     
+  }
+  else if (String(req.input)==String(1)){
+    res.output=Step_One_Two();
+    
+  }
+  else if(String(req.input)==String(3)){
+    res.output=Step_Three_Four();
+    
+  }
+  else if(String(req.input)==String(5)){
+    res.output=Step_Three_Five();
   }
 }
   
@@ -88,6 +96,8 @@ std_msgs::Float32MultiArray potentiometer_msg;  //messaggio da pubblicare
 ros::Publisher pub_potentiometer("/angle", &potentiometer_msg); //go to line 295
 
 int Flag_Movement;//we must define it as global variable and it is callback from the function connected to the movement
+int Flag_Movement_1;
+int Flag_Movement_2; //this two variables are used in the function Step_ONETWO,step_THREE_FOUR
 float Maximum_time_Step = 5.0; //add this new global viariable that we use during the step function
 
 //////////////////////////////Deacceleration values for the PID/////////////////////////////////
@@ -376,22 +386,35 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:ù
   float Maximum_time_Step = 5.0; //this variable is defined also in the original code
   float Pub_angleRH;
   float Pub_angleLH;
+  float Pub_angleLK;
+  float Pub_angleRK;
+  //LH
   int potentiometer_pubLH = 1.0 * analogRead(potPinLH); //voltage meassurenment (10bits resolution);
   Pub_angleLH = Preprocessing_LH.PID_map_float(potentiometer_pubLH, Cal_valuesLH[0], Cal_valuesLH[1], Cal_valuesLH[2], Cal_valuesLH[3], Cal_valuesLH[5], Cal_valuesLH[5]); //estimate initial angle used to meassure the step increment
+  Pub_angleLH = Preprocessing_LH.PID_butter_filter_angle(Pub_angleLH, 1);//estimate initial is filtered
+  //RH
   int potentiometer_pubRH = 1.0 * analogRead(potPinRH); //voltage meassurenment (10bits resolution);
   Pub_angleRH = Preprocessing_RH.PID_map_float(potentiometer_pubRH, Cal_valuesRH[0], Cal_valuesRH[1], Cal_valuesRH[2], Cal_valuesRH[3], Cal_valuesRH[4], Cal_valuesRH[5]); //estimate initial angle used to meassure the step increment
   Pub_angleRH = Preprocessing_RH.PID_butter_filter_angle(Pub_angleRH, 1);//estimate initial is filtered 
-  Pub_angleLH = Preprocessing_LH.PID_butter_filter_angle(Pub_angleLH, 1);//estimate initial is filtered
-  float angle[2]={Pub_angleRH,Pub_angleLH};
-  potentiometer_msg.data=angle;
-  potentiometer_msg.data_length=2;
-  pub_potentiometer.publish(&potentiometer_msg);
+  //LK
+   int potentiometer_pubLK = 1.0 * analogRead(potPinLK); //voltage meassurenment (10bits resolution);
+  Pub_angleLK = Preprocessing_LK.PID_map_float(potentiometer_pubLK, Cal_valuesLK[0], Cal_valuesLK[1], Cal_valuesLK[2], Cal_valuesLK[3], Cal_valuesLK[5], Cal_valuesLK[5]); //estimate initial angle used to meassure the step increment
+  Pub_angleLK = Preprocessing_LK.PID_butter_filter_angle(Pub_angleLK, 1);//estimate initial is filtered
 
-nh.spinOnce();
+  //RK
+   int potentiometer_pubRK = 1.0 * analogRead(potPinRK); //voltage meassurenment (10bits resolution);
+  Pub_angleRK = Preprocessing_RK.PID_map_float(potentiometer_pubRK, Cal_valuesRK[0], Cal_valuesRK[1], Cal_valuesRK[2], Cal_valuesRK[3], Cal_valuesRK[5], Cal_valuesRK[5]); //estimate initial angle used to meassure the step increment
+  Pub_angleRK = Preprocessing_RK.PID_butter_filter_angle(Pub_angleRK, 1);//estimate initial is filtered
+
+
+  float angle[4]={Pub_angleRH,Pub_angleLH,Pub_angleRK,Pub_angleLK};
+  potentiometer_msg.data=angle;
+  potentiometer_msg.data_length=4;
+  pub_potentiometer.publish(&potentiometer_msg);
+  nh.spinOnce();
   delay(500);
   
 }
@@ -903,6 +926,45 @@ char* Step_Five(){
   int Flag_forward_1[4] = {1, 1, 0, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
   if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
+}
+
+char* Step_One_Two(){
+  float Final_position_1[4] = { -1.0, -1.0, 55.0, -45.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
+  int Flag_forward_1[4] = {0, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
+  Flag_Movement_1 = Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+  float Final_position_2[4] = { -10.0, -1.0, 25.0, 0.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
+  int Flag_forward_2[4] = {1, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
+  Flag_Movement_2 =  Flexible_Movement(Final_position_2, Flag_forward_2, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+   if (Flag_Movement_2 == 1) { return "1";}
+  else { return "0" ;}
+  
+}
+
+char* Step_Three_Four()
+{
+  float Final_position_1[4] = { 30.0, -45.0, 0.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
+  int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
+  float Speed_array_customized_1[4] = {Speed_array_default[0] * 1.2, Speed_array_default[1], Speed_array_default[2], Speed_array_default[3]};
+  Flag_Movement_1 =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_customized_1, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+  float Final_position_2[4] = { 20.0, 0.0, -10.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
+  int Flag_forward_2[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
+  Flag_Movement_2 =  Flexible_Movement(Final_position_2, Flag_forward_2, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+   if (Flag_Movement_2 == 1) { return "1";}
+  else { return "0" ;}
+  
+}
+
+char* Step_Three_Five()
+{
+  float Final_position_1[4] = { 30.0, -45.0, 0.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
+  int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
+  float Speed_array_customized_1[4] = {Speed_array_default[0] * 1.2, Speed_array_default[1], Speed_array_default[2], Speed_array_default[3]};
+  Flag_Movement_1 =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_customized_1, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+  float Final_position_2[4] = { 0.0, 0.0, -1.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
+  int Flag_forward_2[4] = {1, 1, 0, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
+  Flag_Movement_2 =  Flexible_Movement(Final_position_2, Flag_forward_2, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
+  if (Flag_Movement_2 == 1) { return "1";}
   else { return "0" ;}
 }
 /*
