@@ -23,41 +23,67 @@ using rosserial_arduino::Test;
 void callback (const Test::Request &req,Test::Response &res)
 {
 
-  // alcuni usano req.input e res.output
-  if (req.input == 'n'){
+  if (String(req.input )== String("n"))
+  {
   res.output=Storing();
   }
-  else if (req.input == 's'){
+  else if (String(req.input) == String("s"))
+  {
   res.output=Stand_Straight();
   
   }
-  else if (req.input == '1'){
-  res.output=Step_One();
+ 
+
+  
+  else if (String(req.input) == String(1)){
+    res.output= Step_One();
   
   }
-  else if (req.input == '2'){
+  else if (String(req.input) == String(2)){
   res.output=Step_Two();
   
   }
-  else if (req.input == '3'){
+  else if (String(req.input) == String(3)){
   res.output=Step_Three();
-  
-  }
-  else if (req.input == '4'){
-  res.output=Step_Four();
-  
-  }
-  else if (req.input == '5'){
-  res.output=Step_Five();
-  
-  }
 
-
+  }
+  else if (String(req.input) == String(4)){
+   res.output=Step_Four();
+  
+  }
+  else if (String(req.input) == String(5)){
+    res.output=Step_Five();
+    
+  }
 }
+  
+  
+  //else if (String(req.input) == String(5)){
+  //res.output=Step_Five();
+  
+ // }
+
+  /*
+ 
+   if (String(req.input) == String(1)){
+   
+   // String Str4 = "okk";
+   //char* uno=Proving();
+  res.output=Proving();
+  //return res.output;
+  }
+  else
+  {
+   char* Str4 = "fallito";
+  res.output=Str4;
+  //return res.output;
+  }
+  */
+  
+
+
 
 ros::ServiceServer<Test::Request, Test::Response> server("/Movement_srv",&callback);
-Test::Request test_req; //capire req da chi viene definita
-Test::Response test_res;
 std_msgs::Float32MultiArray potentiometer_msg;  //messaggio da pubblicare
 ros::Publisher pub_potentiometer("/angle", &potentiometer_msg); //go to line 295
 
@@ -341,6 +367,7 @@ void setup() {
 
   //for rosserial
   //nh.getHardware()->setBaud(57600)
+
   nh.initNode();
   nh.advertiseService(server);
   nh.advertise(pub_potentiometer); 
@@ -366,6 +393,7 @@ void loop() {
 
 nh.spinOnce();
   delay(500);
+  
 }
 
 
@@ -797,25 +825,31 @@ int Flexible_Movement(float * Position_FM, int* Flag_forward_FM, float Max_time_
 
 
 //fuction to put the exo in the storage position
-char Storing(){
+char* Storing(){
 // else if (Straight_key == 'n')
   float Final_position_1[4] = {80.0, -45.0, 80.0, -45.0};//(LH, LK, RH, RK)
   int Flag_forward_1[4] = {1, 1, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement=Flexible_Movement(Final_position_1, Flag_forward_1, 5.0, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-   if (Flag_Movement == 1) { return '1';}
-  else { return '0' ;}
+   if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
 }
-
+/*
+char* Proving(){
+  int f=1;
+  if(f==1){return "1";}
+  else{return "0";}
+}
+*/
 //function to put the exo in the Stand position
-char Stand_Straight()
+char* Stand_Straight()
 {
    //if (Stand_exer_key == 'S') {
   float Final_position_1[4] = {0.0, 0.0, 0.0, 0.0};//(position array, flag activation array, maximum time for movement)
   int Flag_forward_1[4] = {1, 1, 1, 1};//(LH, LK, RH, RK)//0 represents that motor will not be used (LH, LK, RH, RK)
   float Speed_array_customized[4] = {40.0, 40.0, 40.0, 40.0};
   Flag_Movement=Flexible_Movement(Final_position_1, Flag_forward_1, 8.0, 0, Speed_array_customized, Limit_array_default, 0); //(position array, flag activation array, maximum time for movement)
-   if (Flag_Movement == 1) { return '1';}
-  else { return '0'; }
+   if (Flag_Movement == 1) { return "1";}
+  else { return "0"; }
 }
 
 //function that is claimed in the different phase of the movement
@@ -825,51 +859,51 @@ char Stand_Straight()
 //ho dovuto definire anche flag_movement come variabile globale
 
 //if (Gait_key == '1') {
-char Step_One(){
+char* Step_One(){
 float Final_position_1[4] = { -1.0, -1.0, 55.0, -45.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
 int Flag_forward_1[4] = {0, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
 Flag_Movement = Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
- if (Flag_Movement == 1) { return '1';}
-  else { return '0' ;}
+ if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
 }
 
-char Step_Two(){
+char* Step_Two(){
 //if (Gait_key == '2') {
   float Final_position_1[4] = { -10.0, -1.0, 25.0, 0.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 0, 1, 1};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-   if (Flag_Movement == 1) { return '1';}
-  else { return '0' ;}
+   if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
 }
 
-char Step_Three(){
+char* Step_Three(){
 //if (Gait_key == '3') {
   float Final_position_1[4] = { 30.0, -45.0, 0.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   float Speed_array_customized[4] = {Speed_array_default[0] * 1.2, Speed_array_default[1], Speed_array_default[2], Speed_array_default[3]};
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_customized, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-   if (Flag_Movement == 1) { return '1';}
-  else { return '0' ;}
+   if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
 }
 
-char Step_Four()
+char* Step_Four()
 {
   //if (Gait_key == '4') {
   float Final_position_1[4] = { 20.0, 0.0, -10.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 1, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-   if (Flag_Movement == 1) { return '1';}
-  else { return '0' ;}
+   if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
 
 }
 
-char Step_Five(){
-//if (Gait_key == '5') {
+char* Step_Five(){
+//if (Gait_key == "5") {
   float Final_position_1[4] = { 0.0, 0.0, -1.0, -1.0};//LH,LK,RH,RK. -1.0 represents that motor will not be used (this is just redundancy for the operator).
   int Flag_forward_1[4] = {1, 1, 0, 0};//0 represents that motor will not be used (LH, LK, RH, RK)
   Flag_Movement =  Flexible_Movement(Final_position_1, Flag_forward_1, Maximum_time_Step, 0, Speed_array_default, Limit_array_default, General_deacceleration); //(position array, flag activation array, maximum time for movement)
-  if (Flag_Movement == 1) { return '1';}
-  else { return '0' ;}
+  if (Flag_Movement == 1) { return "1";}
+  else { return "0" ;}
 }
 /*
 void callback (const Test::Request & req,Test::Response & res)
